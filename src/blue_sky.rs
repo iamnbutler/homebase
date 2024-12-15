@@ -1,8 +1,13 @@
-use std::env;
+use std::{
+    collections::HashMap,
+    env,
+    ops::{Deref, DerefMut},
+    sync::Arc,
+};
 
 use atrium_api::{
     agent::{store::MemorySessionStore, AtpAgent},
-    app::bsky::feed::{defs::FeedViewPost, get_author_feed},
+    app::bsky::feed::get_author_feed,
     types::{string::Handle, LimitedNonZeroU8, Object},
 };
 
@@ -21,12 +26,19 @@ pub async fn init() -> Result<BlueSkyClient, Box<dyn std::error::Error>> {
     );
 
     agent.login(&blue_sky_username, &blue_sky_password).await?;
+    let now = Utc::now();
 
-    Ok(BlueSkyClient { agent })
+    Ok(BlueSkyClient {
+        agent,
+        last_updated: now,
+        posts: HashMap::new(),
+    })
 }
 
 pub struct BlueSkyClient {
     agent: AtpAgent<MemorySessionStore, ReqwestClient>,
+    last_updated: DateTime<Utc>,
+    posts: HashMap<String, FeedPost>,
 }
 
 #[derive(Debug, Clone)]
@@ -35,10 +47,26 @@ pub struct FeedPost {
     pub text: String,
     pub created_at: DateTime<Utc>,
     pub uri: String,
+    pub attachments: Vec<String>,
 }
 
 impl BlueSkyClient {
-    pub async fn get_posts(&self, limit: u8) -> Result<Vec<FeedPost>, Box<dyn std::error::Error>> {
+    pub async fn update_posts(&mut self, limit: u8) -> Result<(), Box<dyn std::error::Error>> {
+        let new_posts = self.fetch_posts(limit).await?;
+        for post in new_posts {
+            self.posts.insert(post.uri.clone(), post);
+        }
+        self.last_updated = Utc::now();
+        Ok(())
+    }
+
+    pub fn get_ordered_posts(&self) -> Vec<FeedPost> {
+        let mut posts: Vec<FeedPost> = self.posts.values().cloned().collect();
+        posts.sort_by(|a, b| b.created_at.cmp(&a.created_at));
+        posts
+    }
+
+    async fn fetch_posts(&self, limit: u8) -> Result<Vec<FeedPost>, Box<dyn std::error::Error>> {
         let actor = Handle::new("nate.rip".to_string())?;
         let parameters_data = get_author_feed::ParametersData {
             actor: actor.into(),
@@ -70,11 +98,27 @@ impl BlueSkyClient {
                     .with_timezone(&Utc);
                 let uri = post.get("uri")?.as_str()?.to_string();
 
+                let mut attachments = Vec::new();
+                if let Some(embed) = post.get("embed") {
+                    if let Some(images) = embed.get("images") {
+                        if let Some(images_array) = images.as_array() {
+                            for image in images_array {
+                                if let Some(full_size) = image.get("fullsize") {
+                                    if let Some(url) = full_size.as_str() {
+                                        attachments.push(url.to_string());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 Some(FeedPost {
                     handle,
                     text,
                     created_at,
                     uri,
+                    attachments,
                 })
             })
             .collect();
