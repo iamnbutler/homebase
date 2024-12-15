@@ -1,4 +1,5 @@
 mod blue_sky;
+mod ssg;
 
 use blue_sky::BlueSkyClient;
 use dotenv::dotenv;
@@ -33,6 +34,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
+
+    ssg::generate_site()?;
 
     Ok(())
 }
