@@ -1,0 +1,24 @@
+[package]
+name = "homebase"
+authors = ["iamnbutler"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.94"
+atrium-api = { version = "0.24.9", features = ["tokio"] }
+atrium-xrpc-client = { version = "0.5.10", features = ["reqwest"] }
+cargo = "0.84.0"
+check = "1.0.0"
+chrono = { version = "0.4", features = ["serde"] }
+derive_more = "0.99.17"
+dotenv = "0.15.0"
+itertools = "0.13.0"
+parking_lot = "0.12.1"
+rand = "0.8.5"
+reqwest = { version = "0.12", features = ["json"] }
+serde = { version = "1.0.216" }
+serde_json = { version = "1.0.133", features = ["preserve_order", "raw_value"] }
+strum = { version = "0.25.0", features = ["derive"] }
+tokio = { version = "1.42.0", features = ["full"] }
+uuid = { version = "1.1.2", features = ["v4", "serde"] }
