@@ -3,12 +3,11 @@ use std::env;
 use atrium_api::{
     agent::{store::MemorySessionStore, AtpAgent},
     app::bsky::feed::{defs::FeedViewPost, get_author_feed},
-    types::{
-        string::{AtIdentifier, Handle},
-        LimitedNonZeroU8, Object,
-    },
+    types::{string::Handle, LimitedNonZeroU8, Object},
 };
+
 use atrium_xrpc_client::reqwest::ReqwestClient;
+use serde_json::Value;
 
 /// Initialize the Blue Sky client and create a session.
 pub async fn init() -> Result<BlueSkyClient, Box<dyn std::error::Error>> {
@@ -19,9 +18,9 @@ pub async fn init() -> Result<BlueSkyClient, Box<dyn std::error::Error>> {
         ReqwestClient::new("https://bsky.social"),
         MemorySessionStore::default(),
     );
+
     agent.login(&blue_sky_username, &blue_sky_password).await?;
-    let result = agent.api.com.atproto.server.get_session().await?;
-    println!("{:?}", result);
+
     Ok(BlueSkyClient { agent })
 }
 
@@ -29,14 +28,19 @@ pub struct BlueSkyClient {
     agent: AtpAgent<MemorySessionStore, ReqwestClient>,
 }
 
+#[derive(Debug)]
+pub struct SimplifiedPost {
+    pub text: String,
+    pub created_at: String,
+}
+
 impl BlueSkyClient {
     pub async fn get_posts(
         &self,
-        handle: &str,
         limit: u8,
-    ) -> Result<Vec<FeedViewPost>, Box<dyn std::error::Error>> {
-        let actor = Handle::new(handle.to_string())?;
-        let paramaters_data = get_author_feed::ParametersData {
+    ) -> Result<Vec<SimplifiedPost>, Box<dyn std::error::Error>> {
+        let actor = Handle::new("nate.rip".to_string())?;
+        let parameters_data = get_author_feed::ParametersData {
             actor: actor.into(),
             limit: Some(LimitedNonZeroU8::<100>::try_from(limit)?),
             cursor: None,
@@ -44,10 +48,24 @@ impl BlueSkyClient {
             include_pins: None,
         };
 
-        let params: Object<get_author_feed::ParametersData> = paramaters_data.into();
+        let params: Object<get_author_feed::ParametersData> = parameters_data.into();
 
         let response = self.agent.api.app.bsky.feed.get_author_feed(params).await?;
 
-        Ok(response.data.feed)
+        let feed_json: Value = serde_json::to_value(response.data.feed)?;
+
+        let simplified_posts: Vec<SimplifiedPost> = feed_json
+            .as_array()
+            .ok_or("Expected feed to be an array")?
+            .iter()
+            .filter_map(|item| {
+                let post = item.get("post")?;
+                let text = post.get("text")?.as_str()?.to_string();
+                let created_at = post.get("createdAt")?.as_str()?.to_string();
+                Some(SimplifiedPost { text, created_at })
+            })
+            .collect();
+
+        Ok(simplified_posts)
     }
 }

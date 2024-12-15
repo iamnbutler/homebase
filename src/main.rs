@@ -17,12 +17,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app_context = AppContext { blue_sky_client };
 
-    let posts = app_context
-        .blue_sky_client
-        .get_posts("nate.rip", 10)
-        .await?;
+    let posts = app_context.blue_sky_client.get_posts(10).await?;
     for post in posts {
-        println!("{:?}: {:?}", post.post.author.handle, post.post.record);
+        println!("{:?}", post.text);
     }
 
     let resp = get("https://httpbin.org/ip")
