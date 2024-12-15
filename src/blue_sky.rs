@@ -7,6 +7,7 @@ use atrium_api::{
 };
 
 use atrium_xrpc_client::reqwest::ReqwestClient;
+use chrono::{DateTime, Utc};
 use serde_json::Value;
 
 /// Initialize the Blue Sky client and create a session.
@@ -28,17 +29,16 @@ pub struct BlueSkyClient {
     agent: AtpAgent<MemorySessionStore, ReqwestClient>,
 }
 
-#[derive(Debug)]
-pub struct SimplifiedPost {
+#[derive(Debug, Clone)]
+pub struct FeedPost {
+    pub handle: String,
     pub text: String,
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
+    pub uri: String,
 }
 
 impl BlueSkyClient {
-    pub async fn get_posts(
-        &self,
-        limit: u8,
-    ) -> Result<Vec<SimplifiedPost>, Box<dyn std::error::Error>> {
+    pub async fn get_posts(&self, limit: u8) -> Result<Vec<FeedPost>, Box<dyn std::error::Error>> {
         let actor = Handle::new("nate.rip".to_string())?;
         let parameters_data = get_author_feed::ParametersData {
             actor: actor.into(),
@@ -54,18 +54,31 @@ impl BlueSkyClient {
 
         let feed_json: Value = serde_json::to_value(response.data.feed)?;
 
-        let simplified_posts: Vec<SimplifiedPost> = feed_json
+        let posts: Vec<FeedPost> = feed_json
             .as_array()
             .ok_or("Expected feed to be an array")?
             .iter()
             .filter_map(|item| {
                 let post = item.get("post")?;
-                let text = post.get("text")?.as_str()?.to_string();
-                let created_at = post.get("createdAt")?.as_str()?.to_string();
-                Some(SimplifiedPost { text, created_at })
+                let author = post.get("author")?;
+                let handle = author.get("handle")?.as_str()?.to_string();
+                let record = post.get("record")?;
+                let text = record.get("text")?.as_str()?.to_string();
+                let created_at = record.get("createdAt")?.as_str()?;
+                let created_at = DateTime::parse_from_rfc3339(created_at)
+                    .ok()?
+                    .with_timezone(&Utc);
+                let uri = post.get("uri")?.as_str()?.to_string();
+
+                Some(FeedPost {
+                    handle,
+                    text,
+                    created_at,
+                    uri,
+                })
             })
             .collect();
 
-        Ok(simplified_posts)
+        Ok(posts)
     }
 }

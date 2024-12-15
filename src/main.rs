@@ -15,11 +15,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     let blue_sky_client = Arc::new(blue_sky::init().await?);
 
-    let app_context = AppContext { blue_sky_client };
+    let cx = AppContext { blue_sky_client };
 
-    let posts = app_context.blue_sky_client.get_posts(10).await?;
+    let posts = cx.blue_sky_client.get_posts(10).await?;
     for post in posts {
-        println!("{:?}", post.text);
+        println!("@{}: {} ({})", post.handle, post.text, post.created_at);
     }
 
     let resp = get("https://httpbin.org/ip")
