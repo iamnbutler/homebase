@@ -1,30 +1,21 @@
-mod blue_sky;
-mod ssg;
+mod context;
+mod services;
 
-use blue_sky::BlueSkyClient;
+use anyhow::Result;
+use context::AppContext;
 use dotenv::dotenv;
-use std::sync::{Arc, RwLock};
-
-#[derive(Clone)]
-pub struct AppContext {
-    blue_sky_client: Arc<RwLock<BlueSkyClient>>,
-}
+use services::blue_sky::BlueSky;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     dotenv().ok();
 
-    let blue_sky_client = Arc::new(RwLock::new(blue_sky::init().await?));
+    let mut cx = AppContext::new().await?;
 
-    let cx = AppContext { blue_sky_client };
+    cx.register_service::<BlueSky>().await?;
+    cx.update_service("blue_sky").await?;
 
-    {
-        let mut client = cx.blue_sky_client.write().unwrap();
-        client.update_posts(10).await?;
-    }
-
-    let client = cx.blue_sky_client.clone();
-    let posts = client.read().unwrap().get_ordered_posts();
+    let posts = cx.get_blue_sky_posts().await?;
 
     for post in posts {
         println!("@{}: {} ({})", post.handle, post.text, post.created_at);
@@ -36,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    ssg::generate_site(&cx)?;
+    cx.generate_site()?;
 
     Ok(())
 }

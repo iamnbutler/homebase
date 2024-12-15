@@ -6,6 +6,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.94"
+async-trait = "0.1.83"
 atrium-api = { version = "0.24.9", features = ["tokio", "bluesky"] }
 atrium-xrpc-client = { version = "0.5.10", features = ["reqwest"] }
 cargo = "0.84.0"
