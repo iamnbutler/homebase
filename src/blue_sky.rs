@@ -15,6 +15,10 @@ pub async fn init() -> Result<BlueSkyClient, Box<dyn std::error::Error>> {
     let blue_sky_username = env::var("BLUE_SKY_USERNAME").expect("BLUE_SKY_USERNAME not set");
     let blue_sky_password = env::var("BLUE_SKY_PASSWORD").expect("BLUE_SKY_PASSWORD not set");
 
+    println!("Initializing Blue Sky client...");
+    println!("Username length: {}", blue_sky_username.len());
+    println!("Password length: {}", blue_sky_password.len());
+
     let agent = AtpAgent::new(
         ReqwestClient::new("https://bsky.social"),
         MemorySessionStore::default(),
