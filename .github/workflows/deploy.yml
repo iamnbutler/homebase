@@ -8,16 +8,28 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      BLUE_SKY_USERNAME: ${{ secrets.BLUE_SKY_USERNAME }}
+      BLUE_SKY_PASSWORD: ${{ secrets.BLUE_SKY_PASSWORD }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: actions-rs/toolchain@v1
         with:
+          profile: minimal
           toolchain: stable
+
+      - name: Create .env file
+        run: |
+          echo "BLUE_SKY_USERNAME=${{ secrets.BLUE_SKY_USERNAME }}" >> .env
+          echo "BLUE_SKY_PASSWORD=${{ secrets.BLUE_SKY_PASSWORD }}" >> .env
 
       - name: Build
         run: cargo run
+        env:
+          BLUE_SKY_USERNAME: ${{ secrets.BLUE_SKY_USERNAME }}
+          BLUE_SKY_PASSWORD: ${{ secrets.BLUE_SKY_PASSWORD }}
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3

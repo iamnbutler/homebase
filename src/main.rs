@@ -13,6 +13,7 @@ pub struct AppContext {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
+
     let blue_sky_client = Arc::new(RwLock::new(blue_sky::init().await?));
 
     let cx = AppContext { blue_sky_client };
@@ -35,7 +36,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    ssg::generate_site()?;
+    ssg::generate_site(&cx)?;
 
     Ok(())
 }
