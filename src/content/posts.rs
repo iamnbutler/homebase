@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::{fs, path::PathBuf};
 use toml::Table;
 
-use crate::markdown::{FrontMatter, Markdown, ParsedMarkdown};
+use crate::markdown::{slugify, FrontMatter, Markdown, ParsedMarkdown};
 use crate::services::content::Content;
 
 pub struct PostsCollection {
@@ -53,7 +53,8 @@ impl PostsCollection {
     }
 
     fn parse_post(&self, post_meta: &toml::Value, content: &str) -> Result<ParsedMarkdown> {
-        let front_matter: FrontMatter = post_meta.clone().try_into()?;
+        let mut front_matter: FrontMatter = post_meta.clone().try_into()?;
+        front_matter.slug = slugify(&front_matter.title);
         let html_content = Markdown::parse(content)?;
 
         Ok(ParsedMarkdown {

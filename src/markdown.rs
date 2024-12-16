@@ -8,6 +8,7 @@ pub struct FrontMatter {
     pub date: String,
     pub tags: Option<Vec<String>>,
     pub series: Option<String>,
+    pub slug: String,
 }
 
 #[derive(Debug)]
@@ -35,4 +36,16 @@ impl Markdown {
 
         Ok(html_output)
     }
+}
+
+/// Slugifies a string
+pub fn slugify(string: &str) -> String {
+    string
+        .trim()
+        .to_lowercase()
+        .replace(|c: char| !c.is_alphanumeric() && c != '-', "-")
+        .split('-')
+        .filter(|&s| !s.is_empty())
+        .collect::<Vec<_>>()
+        .join("-")
 }
