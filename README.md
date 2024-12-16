@@ -13,3 +13,10 @@ I'm just having fun learning to work with Rust and Async Rust outside of our ver
 Misc TODO:
 - look into using [lightningcss](https://crates.io/crates/lightningcss) for handling css
 - use this as a chance to learn [palette](https://crates.io/crates/palette)
+
+## Usage
+
+- Add content in the `/content` directory
+- Add the appropriate ENV values to your github project
+- `cargo run` to build the project
+- pushes to main will deploy the site to GitHub Pages
