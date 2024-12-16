@@ -36,7 +36,18 @@ impl SiteGenerator {
         );
 
         for post in posts {
-            html.push_str(&format!("        <li>{}</li>\n", post.text));
+            html.push_str(&format!("        <li>\n            <p>{}</p>\n", post.text));
+
+            if !post.attachments.is_empty() {
+                for attachment in post.attachments {
+                    html.push_str(&format!(
+                                "            <img src=\"{}\" alt=\"Post attachment\" class=\"post-image\">\n",
+                                attachment
+                            ));
+                }
+            }
+
+            html.push_str("        </li>\n");
         }
 
         html.push_str(
