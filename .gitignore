@@ -1,4 +1,4 @@
 .env*
-src/public
+/public
 /target
 .DS_Store

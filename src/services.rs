@@ -1,6 +1,4 @@
-use blue_sky::BlueSky;
-use content::ContentSources;
-use site_generator::SiteGenerator;
+use async_trait::async_trait;
 
 use crate::context::AppContext;
 
@@ -8,12 +6,15 @@ pub mod blue_sky;
 pub mod content;
 pub mod site_generator;
 
-pub async fn init_services(cx: &mut AppContext) -> anyhow::Result<()> {
-    cx.register_service::<BlueSky>().await?;
-    cx.register_service::<ContentSources>().await?;
-    cx.register_service::<SiteGenerator>().await?;
+#[async_trait]
+pub trait UpdateableService: Service + Send + Sync {
+    async fn update(&mut self, cx: &AppContext) -> anyhow::Result<()>;
+}
 
-    cx.update_all_services().await?;
-
-    Ok(())
+#[async_trait]
+pub trait Service {
+    async fn init() -> anyhow::Result<Self>
+    where
+        Self: Sized;
+    fn name(&self) -> &'static str;
 }

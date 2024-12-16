@@ -1,4 +1,5 @@
-use crate::context::{AppContext, Service, Updateable};
+use super::{Service, UpdateableService};
+use crate::context::AppContext;
 use anyhow::Result;
 use async_trait::async_trait;
 use std::path::PathBuf;
@@ -23,7 +24,7 @@ pub struct ContentSources {
 
 #[async_trait]
 impl Service for ContentSources {
-    async fn init(_cx: &AppContext) -> Result<Self> {
+    async fn init() -> Result<Self> {
         let posts_src = std::env::current_dir()?.join("content").join("posts");
         Ok(Self {
             posts: Post { src: posts_src },
@@ -36,7 +37,7 @@ impl Service for ContentSources {
 }
 
 #[async_trait]
-impl Updateable for ContentSources {
+impl UpdateableService for ContentSources {
     async fn update(&mut self, _cx: &AppContext) -> Result<()> {
         // No update logic needed for now
         Ok(())

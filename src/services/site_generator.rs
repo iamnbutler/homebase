@@ -1,19 +1,9 @@
-use crate::{
-    context::{Service, Updateable},
-    AppContext,
-};
-use anyhow::{anyhow, Result};
+use super::Service;
+use crate::AppContext;
+use anyhow::Result;
 use async_trait::async_trait;
 
 pub struct SiteGenerator {}
-
-#[async_trait]
-impl Updateable for SiteGenerator {
-    async fn update(&mut self, cx: &AppContext) -> Result<()> {
-        self.generate_site(cx).await.map_err(|e| anyhow!(e))?;
-        Ok(())
-    }
-}
 
 #[async_trait]
 impl Service for SiteGenerator {
@@ -21,14 +11,14 @@ impl Service for SiteGenerator {
         "SiteGenerator"
     }
 
-    async fn init(_cx: &AppContext) -> Result<Self> {
+    async fn init() -> Result<Self> {
         Ok(Self {})
     }
 }
 
 impl SiteGenerator {
-    async fn generate_site(&self, cx: &AppContext) -> Result<()> {
-        // let posts = cx.get_blue_sky_posts().await?;
+    pub async fn generate(&self, cx: &AppContext) -> Result<()> {
+        let posts = cx.blue_sky().read().unwrap().get_ordered_posts();
 
         let mut html = String::from(
             r#"
@@ -45,9 +35,9 @@ impl SiteGenerator {
 "#,
         );
 
-        // for post in posts {
-        //     html.push_str(&format!("        <li>{}</li>\n", post.text));
-        // }
+        for post in posts {
+            html.push_str(&format!("        <li>{}</li>\n", post.text));
+        }
 
         html.push_str(
             r#"
@@ -57,7 +47,9 @@ impl SiteGenerator {
 "#,
         );
 
-        // cx.write_html_file("index.html", &html)?;
+        let path = cx.output_dir().join("index.html");
+        cx.write_file(path, &html)?;
+
         Ok(())
     }
 }

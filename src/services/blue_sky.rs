@@ -11,7 +11,11 @@ use atrium_xrpc_client::reqwest::ReqwestClient;
 use chrono::{DateTime, Utc};
 use serde_json::Value;
 
-use crate::context::{AppContext, Service, Updateable};
+use super::{Service, UpdateableService};
+
+use crate::context::AppContext;
+
+const POSTS_PER_UPDATE: u8 = 30;
 
 pub struct BlueSky {
     agent: AtpAgent<MemorySessionStore, ReqwestClient>,
@@ -19,10 +23,27 @@ pub struct BlueSky {
     posts: HashMap<String, FeedPost>,
 }
 
+impl BlueSky {
+    pub fn new() -> Self {
+        let agent = AtpAgent::new(
+            ReqwestClient::new("https://bsky.social"),
+            MemorySessionStore::default(),
+        );
+
+        BlueSky {
+            agent,
+            last_updated: Utc::now(),
+            posts: HashMap::new(),
+        }
+    }
+}
+
 #[async_trait]
-impl Updateable for BlueSky {
+impl UpdateableService for BlueSky {
     async fn update(&mut self, _cx: &AppContext) -> Result<()> {
-        self.update_posts(10).await.map_err(|e| anyhow!("{}", e))?;
+        self.update_posts(POSTS_PER_UPDATE)
+            .await
+            .map_err(|e| anyhow!("{}", e))?;
         Ok(())
     }
 }
@@ -30,23 +51,18 @@ impl Updateable for BlueSky {
 #[async_trait]
 impl Service for BlueSky {
     /// Initialize the Blue Sky client and create a session.
-    async fn init(_cx: &AppContext) -> Result<Self> {
+    async fn init() -> Result<Self> {
         let blue_sky_username = env::var("BLUE_SKY_USERNAME").expect("BLUE_SKY_USERNAME not set");
         let blue_sky_password = env::var("BLUE_SKY_PASSWORD").expect("BLUE_SKY_PASSWORD not set");
 
-        let agent = AtpAgent::new(
-            ReqwestClient::new("https://bsky.social"),
-            MemorySessionStore::default(),
-        );
+        let blue_sky = Self::new();
 
-        agent.login(&blue_sky_username, &blue_sky_password).await?;
-        let now = Utc::now();
+        blue_sky
+            .agent
+            .login(&blue_sky_username, &blue_sky_password)
+            .await?;
 
-        Ok(BlueSky {
-            agent,
-            last_updated: now,
-            posts: HashMap::new(),
-        })
+        Ok(blue_sky)
     }
 
     fn name(&self) -> &'static str {
@@ -67,7 +83,9 @@ impl BlueSky {
     pub async fn update_posts(&mut self, limit: u8) -> anyhow::Result<()> {
         let new_posts = self.fetch_posts(limit).await?;
         for post in new_posts {
-            self.posts.insert(post.uri.clone(), post);
+            if !self.posts.contains_key(&post.uri) {
+                self.posts.insert(post.uri.clone(), post);
+            }
         }
         self.last_updated = Utc::now();
         Ok(())
