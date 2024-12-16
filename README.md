@@ -2,6 +2,8 @@ Who needs frameworks anyways?
 
 This is a tinker project to see how much a can cram in to a statically hosted GitHub Pages site.
 
+Wandering through figuring out what is the right balance between "writing an entire page as a single raw html string" and "writing an entire framework from scratch"
+
 Current ideas that may make it in:
 - [x] Generate pages from markdown
 - [ ] a full fat site raw html static site generator
