@@ -1,26 +1,12 @@
 use anyhow::Result;
-use pulldown_cmark::{html::push_html, Parser};
-use serde::Deserialize;
 use std::{fs, path::PathBuf};
 
+use crate::markdown::{Markdown, ParsedMarkdown};
 use crate::services::content::Content;
-
-#[derive(Debug, Deserialize)]
-pub struct FrontMatter {
-    pub title: String,
-    pub date: String,
-}
-
-#[derive(Debug)]
-pub struct ParsedPost {
-    pub front_matter: FrontMatter,
-    pub content: String,
-    pub html_content: String,
-}
 
 pub struct PostsCollection {
     src: PathBuf,
-    parsed_posts: Vec<ParsedPost>,
+    parsed_posts: Vec<ParsedMarkdown>,
 }
 
 impl Content for PostsCollection {
@@ -30,7 +16,7 @@ impl Content for PostsCollection {
 }
 
 impl PostsCollection {
-    pub fn new(src: PathBuf) -> anyhow::Result<PostsCollection> {
+    pub fn new(src: PathBuf) -> Result<PostsCollection> {
         let mut collection = PostsCollection {
             src,
             parsed_posts: Vec::new(),
@@ -54,26 +40,18 @@ impl PostsCollection {
         Ok(())
     }
 
-    fn parse_post(&self, content: &str) -> Result<ParsedPost> {
-        let parts: Vec<&str> = content.splitn(3, "---").collect();
-        if parts.len() < 3 {
-            anyhow::bail!("Invalid post format");
-        }
+    fn parse_post(&self, content: &str) -> Result<ParsedMarkdown> {
+        let (front_matter, markdown_content) = Markdown::parse_frontmatter(content)?;
+        let html_content = Markdown::parse(&markdown_content)?;
 
-        let front_matter: FrontMatter = serde_yaml::from_str(parts[1])?;
-        let markdown_content = parts[2];
-
-        let mut html_output = String::new();
-        let parser = Parser::new(markdown_content);
-        push_html(&mut html_output, parser);
-
-        Ok(ParsedPost {
+        Ok(ParsedMarkdown {
             front_matter,
-            content: markdown_content.to_string(),
-            html_content: html_output,
+            content: markdown_content,
+            html_content,
         })
     }
-    pub fn posts(&self) -> Vec<&ParsedPost> {
+
+    pub fn posts(&self) -> Vec<&ParsedMarkdown> {
         let mut sorted_posts = self.parsed_posts.iter().collect::<Vec<_>>();
         sorted_posts.sort_by(|a, b| b.front_matter.date.cmp(&a.front_matter.date));
         sorted_posts

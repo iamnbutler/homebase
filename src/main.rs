@@ -1,5 +1,6 @@
 mod content;
 mod context;
+mod markdown;
 mod services;
 mod utils;
 
