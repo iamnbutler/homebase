@@ -1,0 +1,34 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Music Stats</title>
+    </head>
+    <body>
+    <a href="index.html">&larr; Back Home</a>
+
+        <article>
+            <h1>Music Stats</h1>
+            <time>2015-08-21</time>
+            <h2>The Project</h2>
+<p>Music Stats is a visual art &amp; infographic site. It's generated from my personal music listening history, showing 3 axis of data – total plays, recency of track, and "hotness" – custom score based on how frequently a song is played in relation to when it was added.</p>
+<p>content/posts/Music Stats.md</p>
+<p>Individual bars represent songs. Taller bars are more frequently played, while warmer colored ones are hotter (played very frequently.)</p>
+<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1636936185/post/music-stats/Screenshot_2015-10-20_22.39.09_dhxriu.png" alt="" /></p>
+<p>Clicking on a bar opens a modal with its info, and does a search for the song on Youtube.</p>
+<h2>The Tech</h2>
+<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1636936182/post/music-stats/Screenshot_2015-10-17_05.02.35_p6cfwi.jpg" alt="" /></p>
+<p>The site is built in Javascript using <a href="https://d3js.org/">d3.js</a> to generate the charts from TSV data sets, and a custom implementation of the Youtube API &amp; I'm Feeling Lucky to grab the first video available. <a href="https://github.com/iamnbutler/music-stats/blob/master/js/scripts.js">Check out the script</a>.</p>
+<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1636936183/post/music-stats/Screenshot_2015-10-17_19.23.28_yl2nli.png" alt="" /></p>
+<p>The gradient on each bar is unique – it's created by an SVG polyfill filter generated using each song's plays, recency and hotness.</p>
+<h2>The Result</h2>
+<p>As a visual piece I think the work was sucessful – to show off interesting listening trends visually. I wish I could have got filtering built in time so the data could be explored futher – I think this overall would have made the piece more exciting over all.</p>
+<p>I had plans to make it so anyone could add their own TSV/CSV to see their own results, and did get this working in code, but didn't have time to solve how to allow people to upload their own data. Maybe in the future!</p>
+<p><a href="http://iamnbutler.github.io/music-stats/">Go to Site</a> <a href="https://github.com/iamnbutler/music-stats">View on Github</a></p>
+
+        </article>
+    </body>
+    </html>
+    

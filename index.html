@@ -4,322 +4,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Blog Posts</title>
+    <title>My Blog</title>
 </head>
 <body>
     <h1>Hello, World</h1>
 
     <h2>Posts</h2>
+    <ul>
     
-    <article>
-        <h3>Adding a Favicon in 2024</h3>
-        <time>2024-02-27</time>
-        <hr />
-<p>title: Adding a Favicon in 2024
-date: 2024-02-27
-tags:</p>
-<ul>
-<li>webdev
-series: Astro Site 2024</li>
-</ul>
-<hr />
-<p>Let's go on a quick side quest to add a favicon to this new site. These always seem to be a bit of a pain because the vendor requirements are always changing. Evil Martians have a really great writeup that covers a lot of this here: <a href="https://evilmartians.com/chronicles/how-to-favicon-in-2021-six-files-that-fit-most-needs">How to Favicon in 2024: Six files that fit most needs
-</a>.</p>
-<p>We'll mostly follow that, with a few Astro-isms tossed in.</p>
-<p>To start, we'll need to create an asset for our favicon. I'd actually recommend calling this something other than <code>favicon</code> to prevent the browser from loading it in a way you don't expect, due to it looking for things named <code>favicon</code>.</p>
-<p>In the end, these are the assets I ended up with:</p>
-<pre><code>public/
-  apple-touch-icon.png    // 180x180 for iOS
-  favicon.ico             // 32x32 for any non-svg supporting browsers
-                          // You may want a custom 16x16 icon if your
-                          // favicon won't look good scaled down automatically
-  icon.svg                // More on this below
-  icon-dev.svg            // Alternate icon to indicate development environments
-  icon_192.png            // 192x192 for Android
-  icon_512.png            // 512x512 for Android
-  manifest.webmanifest    // Web App Manifest
-</code></pre>
-<h2>The SVG Favicon</h2>
-<p><code>icon.svg</code> does double duty as both the light and dark mode icon.</p>
-<pre><code class="language-html">&lt;svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none"&gt;
-  &lt;style&gt;
-    @media (prefers-color-scheme: dark) {
-      .a {
-        fill: #fff;
-      }
-    }
-  &lt;/style&gt;
-  &lt;path
-    fill="#000"
-    fill-rule="evenodd"
-    d="M20 4h-4v8h-4V4H8v12H4v4h4v4H4v4h24v-4H12v-8h16V4h-4v8h-4z"
-    class="a"
-    clip-rule="evenodd"
-  /&gt;
-&lt;/svg&gt;
-</code></pre>
-<p>We use a media query to change the fill color of the icon based on the user's preferred color scheme. This means that even if a user's browser uses a dark color tab bar, the favicon will still look good.</p>
-<p>This approach feels a bit more elegant than swapping out the icon with JavaScript, or having multiple icons in the markup.</p>
-<h2>The Dev-Mode Favicon</h2>
-<p>A cool little trick I picked up from the Evil Martians article is to use a different icon in development environments. The approach they used was a little different, involving a custom webpack plugin, but we can do something far easier in Astro.</p>
-<p>Here is my current <code>head.astro</code> file:</p>
-<pre><code class="language-astro">&lt;!-- src/components/head.astro --&gt;
----
-interface HeadProps {
-    title: string;
-}
-
-const is_dev = import.meta.env.DEV;
-const { title } = Astro.props as HeadProps;
----
-
-&lt;head&gt;
-    &lt;meta charset="utf-8" /&gt;
-
-    &lt;link rel="manifest" href="/manifest.webmanifest" /&gt;
-    &lt;link rel="icon" href="/favicon.ico" sizes="32x32" /&gt;
-    &lt;!-- Show a different favicon if in development env --&gt;
-    &lt;link rel="icon" href={`/icon${is_dev &amp;&amp; "-dev"}.svg`} type="image/svg+xml" /&gt;
-    &lt;link rel="apple-touch-icon" href="/apple-touch-icon.png" /&gt;
-
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
-    &lt;meta name="generator" content={Astro.generator} /&gt;
-
-    &lt;title&gt;{title}&lt;/title&gt;
-&lt;/head&gt;
-</code></pre>
-<p>Astro exposes these handy <a href="https://docs.astro.build/en/guides/environment-variables/">base environment variables</a> that we can use to conditionally load different assets based on the environment.</p>
-<p>Using them we can conditionally load the <code>icon-dev.svg</code> in development environments, and the regular <code>icon.svg</code> in production to make it super clear from the tab bar which environment we're in.</p>
-<p>I love this so much as I constantly get mixed up with a prod tab open, and spend time debugging only to realize I'm in the wrong environment... maybe just me 😅</p>
-<h2>The Web App Manifest</h2>
-<p>The web app manifest is a JSON file that tells the browser about your web application and how it should behave when 'installed' on the user's mobile device or desktop.</p>
-<p>Mine is pretty simple:</p>
-<pre><code class="language-json">{
-  "name": "nate.rip",
-  "icons": [
-    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
-    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
-  ]
-}
-</code></pre>
-<p>This will ensure places that use it will get the higher definition icons, and the browser will know what to do when the user tries to add the site to their home screen.</p>
-<p>And that is it!</p>
-<p>Let me know if I missed anything...</p>
-<p>There are a million different sizes and shapes for favicons, but I feel like this is a resonable amount of coverage for something simple like a personal site or blog.</p>
-
-    </article>
-    
-    <article>
-        <h3>Building a new site with Astro</h3>
-        <time>2024-02-26</time>
-        <hr />
-<p>title: Building a new site with Astro
-date: 2024-02-26
-tags:</p>
-<ul>
-<li>webdev</li>
-<li>js
-series: Astro Site 2024</li>
-</ul>
-<hr />
-<p>I'm out on paternity leave until early April, and with things finally calming down a little bit with the little one I thought I'd take a little time to build a new site.</p>
-<p>For now this is a bit of a back-to-basics approach. I'm trying out Astro, and it feels oddly nostalgic for some reason – like I'm building a site in the early 2000s. It's a bit of a throwback, but in a good way.</p>
-<p>I'm keeping things really simple for now. A single stylesheet, markdown for content, and a few components.</p>
-<p>So far Astro's <a href="https://docs.astro.build/en/guides/content-collections/">Content Collections</a> have made getting content into the site really easy. It is nice that it uses Zod right out of the box for validation as if I'm working with TypeScript it feels wrong to have untyped data like markdown frontmatter usually is.</p>
-<p>Honestly, it's been a bit of a struggle not using Tailwind for the first time in quite a while–but it's been interesting getting back into the swing of writing CSS again.</p>
-<p>Rather than where I usually get held up when building a new site (trying to backport content, update posts I never finished, try to get things perfect...) I'm just going to start with a clean slate, minimal content, ship quickly and see where things go from there.</p>
-<p>Wish me luck!</p>
-<p>Nate out 🫡</p>
-
-    </article>
-    
-    <article>
-        <h3>Generating a Content Index</h3>
-        <time>2024-02-26</time>
-        <hr />
-<p>title: Generating a Content Index
-date: 2024-02-26
-tags:</p>
-<ul>
-<li>webdev</li>
-<li>python
-series: Astro Site 2024</li>
-</ul>
-<hr />
-<p>I've been eyeing <a href="https://github.com/tinysearch/tinysearch">TinySearch</a> for a long while, and now is a great chance while things are super simple to try to get it working.</p>
-<p><a href="https://endler.dev/2019/tinysearch/">Matthias Endler</a> has a great post on experimenting with building a <em>really</em> tiny site-wide search utalizing Rust &amp; WASM, and ever since I read it I've been wanting to try it out.</p>
-<p>What we'll need up front is a content index–a JSON file that contains all of the content on the site that we want to index for search. This will include things like the title, description, and URL of each page. We'll want to include the body as well, but there is probably some magic we can do to reduce the amount of text we bring in from the body to keep things as small as possible.</p>
-<p>We need an output that looks something like <a href="https://github.com/tinysearch/tinysearch/blob/master/fixtures/index.json">this</a>, so let's get to work on that.</p>
-<h2>Creating the Index</h2>
-<p>After playing with some <code>ts-node</code> nonsense, I realized that python is probably the easiest tool for the job here.</p>
-<p>This little script will walk through the <code>src/content</code> directory and generate a JSON file that contains all of the metadata for each markdown document.</p>
-<pre><code class="language-python">import json
-import os
-import re
-from typing import Dict
-
-def create_slug_from_filename(filename: str) -&gt; str:
-    return re.sub(r'^\d+[-_]', '', filename).rsplit('.', 1)[0]
-
-def extract_metadata(content: str) -&gt; Dict[str, str]:
-    metadata = {}
-    match = re.search(r'^---\s+(.*?)\s+---', content, re.DOTALL)
-    if match:
-        front_matter = match.group(1)
-        for line in front_matter.splitlines():
-            key, value = line.split(': ', 1)
-            metadata[key.strip()] = value.strip().strip('"').strip("'")
-    return metadata
-
-def create_content_index(src_folder: str) -&gt; None:
-    index = {}
-    for root, dirs, files in os.walk(src_folder):
-        folder = os.path.basename(root)
-        if folder == 'content':
-            continue
-        index[folder] = {}
-        for file in files:
-            if file.endswith('.md'):
-                filepath = os.path.join(root, file)
-                with open(filepath, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    metadata = extract_metadata(content)
-                    slug = create_slug_from_filename(file)
-                    index[folder][slug] = {
-                        'slug': slug,
-                        'date_published': metadata.get('date_published', 'No Date Published'),
-                        'title': metadata.get('title', 'No Title'),
-                        'preview': metadata.get('preview', 'No Preview')
-                    }
-
-    with open('index/content.json', 'w', encoding='utf-8') as f:
-        json.dump(index, f, indent=4)
-
-create_content_index('src/content')
-</code></pre>
-<p>Running it outputs some json that looks like this:</p>
-<pre><code class="language-json">{
-  "fragment": {
-    "00": {
-      "slug": "00",
-      "date_published": "2024-02-27",
-      "title": "Building a new site with Astro",
-      "preview": "It's that time of year again \u2013 time to build a new site. This time, I'm using Astro. Here's how it's going."
-    },
-    "01": {
-      "slug": "01",
-      "date_published": "2024-02-27",
-      "title": "Generating a content index",
-      "preview": "Ahead of some schemes of building site-wide content search, and perhaps an RSS feed, let's build a content index."
-    }
-  }
-}
-</code></pre>
-<p>This looks pretty good for our needs. I'm not sure yet if we need to match the exact structure of the TinySearch index – we'll look into that next. But now we have a handy JSON index of all of our content that we can use for whatever we need.</p>
-
-    </article>
-    
-    <article>
-        <h3>Launching Facebook Avatars</h3>
-        <time>2019-05-03</time>
-        <p>Today Facbook launched <a href="https://www.theverge.com/2019/6/3/18650685/facebook-avatar-messenger-newsfeed-bitmoji">a test of Facebook Avatars</a> publicly! I worked on Avatars for around 2.5 years, so it is exciting to see it finally getting into the wild.</p>
-<p>I never would have imagined the complexity and amount of difficult decisions it takes to get a system like this off the ground. I have a lot of respect for all the teams out there working on likeness systems for people.</p>
-<p>We have such a long way to go towards representing the incredibly diverse and special population of the world, and I wish we could have won more of the fights towards further representation towards disabilities before launching.</p>
-<p>However, this is the first leg of the race, not crossing the finish line. I'm so incredibly proud of this team and can't wait to see this product evolve over time.</p>
-<p>Even before I joined, this was the project I wanted to start. I believe that the unique position that Facebook is in makes a virtual identity a powerful thing if done responsibly. From adding an extra layer of expression to people's content to giving people safety to post what they want in places they can't show their faces, Avatars can unlock new ways for people to use Facebook that enriches their lives. My goal being at Facebook has always been to bring a bit of joy and fun into the world, and I hope this does that even a little for people.</p>
-
-    </article>
-    
-    <article>
-        <h3>Design Workshop Posters</h3>
-        <time>2015-11-25</time>
-        <h3>WHAT IS CUUUBIC?</h3>
-<p>It is a project about exploring new techniques and ways of making. Rather than starting with a problem and trying to solve it, I chose a concept and started making things and exploring to find what I could discover. It was a very freeing process.</p>
-<h3>Why CUUUBIC?</h3>
-<p>From the beginning I started working with voxels, which is a 3D pixel, or a cube. I needed a simple name to categorize everything under, so I thought it was suitable.</p>
-<h3>What was the work made in?</h3>
-<p>I experimented with quite a few technologies, but the primary ones used were Photoshop, Illustrator, Blender, Maya and a program called MagicaVoxel.</p>
-<h4>Making to find a problem (and yourself.)</h4>
-<p>Design as making is the idea of finding a problem through exploration, rather than starting with a problem using it to design a solution. Starting from a pre-existing problem may limit exploration, whereas starting right from making makes it easier to explore without the burden of fitting a solution. The conclusions found through making can be fluid, changing as further making brings to light new ideas. The process of making work can become the work itself. Through creating a body of work you can begin to discover meaning and a voice.</p>
-<p>A designer creates value by making work. The quality of the work will be judged by individuals and the design community as a whole, but good or bad each piece of work builds on who the designer is as a whole. The value mentioned here isn't monetary value or how good the design is, it is the work's place in the voice of the designer overall.</p>
-<h2>2. The Project</h2>
-<hr />
-<p>Step into a world of intense color and imagination gone wild. Cuuubic is an exploration of color and space and the relationship between 3D objects. The work goes beyond a generated image and takes the viewer on a journey through the beautiful spaces that color, light and material generate when interacting. Shadow and reflection amplify these spaces, often creating textures or colors completely different than the original objects have. The project focused on exploration and design as a process. Exploration wasn't limited to only creating visual work, but exploring a vast amount of tools, using varied techniques and experimenting with the possibilities of materials, the way the light moves, and the way reflections interact. Not every avenue taken was successful but the failures lead the way to a process that created many visually stunning results. In employing a wide and deep process I hoped to discover a voice that would resonate with both myself and the audience. Through sharing my work with others I've become that guy that makes art with cubes and things, which speaks to the voice that I've begun to create.</p>
-<p>The work can be described as imagination gone wild (but not that wild.) It explores color and space and the relationship between objects. The interesting part of the work goes beyond just the image generated. It is the play between the objects, materials and reflections. Shadows and reflections form that bring out new color and shapes created by the interaction of materials and light. The length of the project was short, so I focused my exploration on exploring those interactions. Through sharing my work with others I've become that makes art with cubes and things, which I think speaks to the idea of making being part of defining a voice. The work matters because it shows the results of my making and research, a step toward creating a voice and exploration into a territory of design I have not stepped before.</p>
-<h2>3. Selfish Design</h2>
-<hr />
-<h3>Or how the project became personal without it meaning to</h3>
-<h2>4. Complexity vs Impact</h2>
-<hr />
-<h3>MORE COMPLEX DOESN'T MEAN MORE EFFECTIVE</h3>
-<p>I started this project wanting to explore the concept of worlds, either digital or imaginary. Something that doesn't exist in our own world, beyond what we see in our everyday lives, like an alternate reality. I spent a lot of time working with more realistic (non-abstract) imagery like landscapes, but I found they took a long time to create a single piece, which stopped me from creating work rapidly and exploring multiple ideas. The also needed to feel believable, which changed the type of reaction the audience had when viewing them. By working with simple shapes like cubes and rectangles I could build a variety of simple to moderately complex environments very quickly, which allows time to explore in the rendering phase, which is usually where the magic happens.</p>
-<p>The joy of working in 3D tools versus traditional tools like Photoshop or Illustrator is that the compositions can be rotated and manipulated in 3D, which often returns interesting and unexpected results. This process greatly aids discovery through making. I would love to return to making more complex pieces, as I think they are great at communicating a specific feeling, but for now the time investment wouldn't allow me to work as effectively</p>
-<h2>5. Tools are just tools</h2>
-<hr />
-<h3>Learning new things is great but can get in the way of making.</h3>
-<h2>6. Who came before you?</h2>
-<hr />
-<h3>Finding others who have done work similar to yours can help you understand where your work belongs.</h3>
-<h2>7. What is the message? (What did I find?)</h2>
-<hr />
-<h3>Making is good, but making for a reason is better.</h3>
-<p>I started exploring if I could discover a connection between color and an observer's emotional response. I examined topics like how emotion and color are related, what kind of emotions certain kinds of colors gave off, and if people reacted to the same piece differently. From my observations different color schemes give off very different feels. Softer colors and materials give a calm, warm and soft feeling. Darker colors and reflective materials in dark light give off cooler and more serious emotion. Dull colors and rough textures feel old and worn, uninspired and even depressing. The theme of connecting color and emotion seemed very obvious to me, and without testing against users or doing additional research to improve upon this theory I wasn't going to make much progress with it. I realized that I was still in the early phases on my exploration, and likely should not have taken such an open-ended approach with a project that has such a short deadline.<br />
-As I continued making I began to notice details that were not planned, but became the central themes to the work. Details like a new color being created in a reflection, or two shapes combining because of the perspective the image is rendered at. These "happy accidents" became the focus of my project as further pursued the interaction in the spaces between the colors and shapes I had chosen. In my most recent work I've tried to continue to explore these interactions and create work that would allow me to share them clearly. I believe that with time for further exploration I could isolate more clearly the message I want to convey with these pieces, but for now I continue to explore and create in hope of a revelation.</p>
-<h2>8. Don't give up on an idea before you have made anything.</h2>
-<hr />
-<h3>The Blank Canvas Effect can be terrifying, don't let it stop you for creating.</h3>
-<p>"One of the things that I think holds me back is a fear of creating or writing things that are bad. Once something is made it feels so permanent, and that is terrifying to me."</p>
-
-    </article>
-    
-    <article>
-        <h3>Music Stats</h3>
-        <time>2015-08-21</time>
-        <h2>The Project</h2>
-<p>Music Stats is a visual art &amp; infographic site. It's generated from my personal music listening history, showing 3 axis of data – total plays, recency of track, and "hotness" – custom score based on how frequently a song is played in relation to when it was added.</p>
-<p>content/posts/Music Stats.md</p>
-<p>Individual bars represent songs. Taller bars are more frequently played, while warmer colored ones are hotter (played very frequently.)</p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1636936185/post/music-stats/Screenshot_2015-10-20_22.39.09_dhxriu.png" alt="" /></p>
-<p>Clicking on a bar opens a modal with its info, and does a search for the song on Youtube.</p>
-<h2>The Tech</h2>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1636936182/post/music-stats/Screenshot_2015-10-17_05.02.35_p6cfwi.jpg" alt="" /></p>
-<p>The site is built in Javascript using <a href="https://d3js.org/">d3.js</a> to generate the charts from TSV data sets, and a custom implementation of the Youtube API &amp; I'm Feeling Lucky to grab the first video available. <a href="https://github.com/iamnbutler/music-stats/blob/master/js/scripts.js">Check out the script</a>.</p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1636936183/post/music-stats/Screenshot_2015-10-17_19.23.28_yl2nli.png" alt="" /></p>
-<p>The gradient on each bar is unique – it's created by an SVG polyfill filter generated using each song's plays, recency and hotness.</p>
-<h2>The Result</h2>
-<p>As a visual piece I think the work was sucessful – to show off interesting listening trends visually. I wish I could have got filtering built in time so the data could be explored futher – I think this overall would have made the piece more exciting over all.</p>
-<p>I had plans to make it so anyone could add their own TSV/CSV to see their own results, and did get this working in code, but didn't have time to solve how to allow people to upload their own data. Maybe in the future!</p>
-<p><a href="http://iamnbutler.github.io/music-stats/">Go to Site</a> <a href="https://github.com/iamnbutler/music-stats">View on Github</a></p>
-
-    </article>
-    
-    <article>
-        <h3>Creating Motion Graphics in Isadora</h3>
-        <time>2013-11-05</time>
-        <p><img src="https://res.cloudinary.com/yaminateo/video/upload/v1637120269/project/isadora/academy-leader_eryomr.mp4" alt="" /></p>
-<p>These are a few outputs from a project using Isadora to create motion visuals.</p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1637119624/project/isadora/604e6a3ea8cd2be7c9c89736_Screenshot_2013-11-05_00.33.13_bq7fm2.png" alt="" /></p>
-<p>Isadora is a node driven software that also interfaces with hardware like arduinos, sensors, etc.</p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1637121210/project/isadora/IMG_0008_culnun.jpg" alt="" /></p>
-<p>Using the built in web cam, IR sensors and a dial I was able to create a variety of really cool visuals.</p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1637119625/project/isadora/604e6a334cfde041003ff69b_Screenshot_2013-10-15_15.16.05_svedfe.png" alt="" /></p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1637119625/project/isadora/604e6a33c2649a7265b26abe_Screenshot_2013-10-15_15.08.19_a6nwp7.png" alt="" /></p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1637121095/project/isadora/CleanShot_-_2021-11-16_at_22.44.28_2x_lyq2gb.png" alt="" /></p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1637121059/project/isadora/CleanShot_-_2021-11-16_at_22.48.48_zrc93q.gif" alt="" /></p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1637121053/project/isadora/CleanShot_-_2021-11-16_at_22.49.48_tfw6qr.gif" alt="" /></p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/w_1000,ar_16:9,c_fill,g_auto,e_sharpen/v1637120374/project/isadora/Screenshot_2013-10-08_00.50.00_ppwo1r.png" alt="" /></p>
-<p><img src="https://res.cloudinary.com/yaminateo/image/upload/v1637121105/project/isadora/CleanShot_-_2021-11-16_at_22.44.09_2x_ganuxr.png" alt="" /></p>
-
-    </article>
-    
-    <article>
-        <h3>York/Sheridan Design Website</h3>
-        <time>2012-06-17</time>
-        <p>I developed the website for the York/Sheridan Design program (<a href="https://design.ampd.yorku.ca/">design.yorku.ca</a>), design by Chris Baldesarra.</p>
-<p>It was built using HTML5, SCSS &amp; Expression Engine.</p>
-
-    </article>
-    
+        <li>
+            <h3><a href="adding-a-favicon-in-2024.html">Adding a Favicon in 2024</a></h3>
+            <time>2024-02-27</time>
+        </li>
+        
+        <li>
+            <h3><a href="building-a-new-site-with-astro.html">Building a new site with Astro</a></h3>
+            <time>2024-02-26</time>
+        </li>
+        
+        <li>
+            <h3><a href="generating-a-content-index.html">Generating a Content Index</a></h3>
+            <time>2024-02-26</time>
+        </li>
+        
+        <li>
+            <h3><a href="launching-facebook-avatars.html">Launching Facebook Avatars</a></h3>
+            <time>2019-05-03</time>
+        </li>
+        
+        <li>
+            <h3><a href="design-workshop-posters.html">Design Workshop Posters</a></h3>
+            <time>2015-11-25</time>
+        </li>
+        
+        <li>
+            <h3><a href="music-stats.html">Music Stats</a></h3>
+            <time>2015-08-21</time>
+        </li>
+        
+        <li>
+            <h3><a href="creating-motion-graphics-in-isadora.html">Creating Motion Graphics in Isadora</a></h3>
+            <time>2013-11-05</time>
+        </li>
+        
+        <li>
+            <h3><a href="york-sheridan-design-website.html">York/Sheridan Design Website</a></h3>
+            <time>2012-06-17</time>
+        </li>
+        </ul>
     <h2>Blue Sky Posts</h2>
     <ul>
         <li>
