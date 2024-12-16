@@ -9,6 +9,7 @@ use context::AppContext;
 use dotenv::dotenv;
 use services::UpdateableService;
 
+// todo!(): Stop blindly unwrapping
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
@@ -16,7 +17,9 @@ async fn main() -> Result<()> {
     let cx = AppContext::new().await?;
 
     cx.blue_sky().write().unwrap().update(&cx).await?;
-    cx.site_generator().read().unwrap().generate(&cx).await?;
+
+    let site_generator = cx.site_generator().read().unwrap();
+    site_generator.generate(&cx).await?;
 
     Ok(())
 }

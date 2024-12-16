@@ -25,7 +25,6 @@ impl PostsCollection {
             metadata: Table::new(),
         };
 
-        // Load metadata from index.toml
         let metadata_path = src.join("index.toml");
         let metadata_content = fs::read_to_string(metadata_path)?;
         collection.metadata = metadata_content.parse::<Table>()?;
@@ -54,7 +53,12 @@ impl PostsCollection {
 
     fn parse_post(&self, post_meta: &toml::Value, content: &str) -> Result<ParsedMarkdown> {
         let mut front_matter: FrontMatter = post_meta.clone().try_into()?;
-        front_matter.slug = slugify(&front_matter.title);
+
+        // Generate slug from title if not present
+        if front_matter.slug.is_none() {
+            front_matter.slug = Some(slugify(&front_matter.title));
+        }
+
         let html_content = Markdown::parse(content)?;
 
         Ok(ParsedMarkdown {

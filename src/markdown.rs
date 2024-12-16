@@ -8,7 +8,8 @@ pub struct FrontMatter {
     pub date: String,
     pub tags: Option<Vec<String>>,
     pub series: Option<String>,
-    pub slug: String,
+    #[serde(default)]
+    pub slug: Option<String>,
 }
 
 #[derive(Debug)]
@@ -48,4 +49,12 @@ pub fn slugify(string: &str) -> String {
         .filter(|&s| !s.is_empty())
         .collect::<Vec<_>>()
         .join("-")
+}
+
+fn deserialize_slug<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let title: String = String::deserialize(deserializer)?;
+    Ok(slugify(&title))
 }

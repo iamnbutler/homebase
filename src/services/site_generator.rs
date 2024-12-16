@@ -1,5 +1,8 @@
 use super::{blue_sky::FeedPost, Service};
-use crate::{markdown::ParsedMarkdown, AppContext};
+use crate::{
+    markdown::{slugify, ParsedMarkdown},
+    AppContext,
+};
 use anyhow::Result;
 use async_trait::async_trait;
 
@@ -47,11 +50,10 @@ impl SiteGenerator {
         let posts = content_sources.posts_collection().posts();
 
         for post in posts {
+            let slugified_title = slugify(&post.front_matter.title);
+            let slug = post.front_matter.slug.as_ref().unwrap_or(&slugified_title);
             let html = self.render(Layout::Page, vec![post], &[]);
-            let path = cx
-                .output_dir()
-                .join(&post.front_matter.slug)
-                .with_extension("html");
+            let path = cx.output_dir().join(&slug).with_extension("html");
             cx.write_file(path, &html)?;
         }
 
@@ -84,20 +86,25 @@ impl SiteGenerator {
     <h1>Hello, World</h1>
 
     <h2>Posts</h2>
+    <ul>
     "#,
         );
 
         for post in posts {
+            let slugified_title = slugify(&post.front_matter.title);
+            let slug = post.front_matter.slug.as_ref().unwrap_or(&slugified_title);
             html.push_str(&format!(
                 r#"
-    <article>
-        <h3><a href="{}.html">{}</a></h3>
-        <time>{}</time>
-    </article>
-    "#,
-                post.front_matter.slug, post.front_matter.title, post.front_matter.date,
+        <li>
+            <h3><a href="{}.html">{}</a></h3>
+            <time>{}</time>
+        </li>
+        "#,
+                slug, post.front_matter.title, post.front_matter.date,
             ));
         }
+
+        html.push_str("</ul>");
 
         html.push_str(
             r#"
@@ -133,25 +140,31 @@ impl SiteGenerator {
     }
 
     fn render_page(&self, post: &ParsedMarkdown) -> String {
+        let slug = post
+            .front_matter
+            .slug
+            .as_ref()
+            .unwrap_or(&slugify(&post.front_matter.title));
         format!(
             r#"
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{}</title>
-</head>
-<body>
-    <article>
-        <h1>{}</h1>
-        <time>{}</time>
-        {}
-    </article>
-    <a href="index.html">Back to Home</a>
-</body>
-</html>
-"#,
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{}</title>
+    </head>
+    <body>
+    <a href="index.html">&larr; Back Home</a>
+
+        <article>
+            <h1>{}</h1>
+            <time>{}</time>
+            {}
+        </article>
+    </body>
+    </html>
+    "#,
             post.front_matter.title,
             post.front_matter.title,
             post.front_matter.date,
