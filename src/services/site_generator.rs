@@ -21,14 +21,14 @@ impl Service for SiteGenerator {
         "SiteGenerator"
     }
 
-    async fn init() -> Result<Self> {
+    async fn init(_cx: &AppContext) -> Result<Self> {
         Ok(Self {})
     }
 }
 
 impl SiteGenerator {
     async fn generate_site(&self, cx: &AppContext) -> Result<()> {
-        let posts = cx.get_blue_sky_posts().await?;
+        // let posts = cx.get_blue_sky_posts().await?;
 
         let mut html = String::from(
             r#"
@@ -45,9 +45,9 @@ impl SiteGenerator {
 "#,
         );
 
-        for post in posts {
-            html.push_str(&format!("        <li>{}</li>\n", post.text));
-        }
+        // for post in posts {
+        //     html.push_str(&format!("        <li>{}</li>\n", post.text));
+        // }
 
         html.push_str(
             r#"
@@ -57,7 +57,7 @@ impl SiteGenerator {
 "#,
         );
 
-        cx.write_html_file("index.html", &html)?;
+        // cx.write_html_file("index.html", &html)?;
         Ok(())
     }
 }

@@ -13,26 +13,6 @@ use serde_json::Value;
 
 use crate::context::{AppContext, Service, Updateable};
 
-/// Initialize the Blue Sky client and create a session.
-pub async fn init() -> Result<BlueSky> {
-    let blue_sky_username = env::var("BLUE_SKY_USERNAME").expect("BLUE_SKY_USERNAME not set");
-    let blue_sky_password = env::var("BLUE_SKY_PASSWORD").expect("BLUE_SKY_PASSWORD not set");
-
-    let agent = AtpAgent::new(
-        ReqwestClient::new("https://bsky.social"),
-        MemorySessionStore::default(),
-    );
-
-    agent.login(&blue_sky_username, &blue_sky_password).await?;
-    let now = Utc::now();
-
-    Ok(BlueSky {
-        agent,
-        last_updated: now,
-        posts: HashMap::new(),
-    })
-}
-
 pub struct BlueSky {
     agent: AtpAgent<MemorySessionStore, ReqwestClient>,
     last_updated: DateTime<Utc>,
@@ -49,8 +29,24 @@ impl Updateable for BlueSky {
 
 #[async_trait]
 impl Service for BlueSky {
-    async fn init() -> Result<Self> {
-        init().await.map_err(|e| anyhow!("{}", e))
+    /// Initialize the Blue Sky client and create a session.
+    async fn init(_cx: &AppContext) -> Result<Self> {
+        let blue_sky_username = env::var("BLUE_SKY_USERNAME").expect("BLUE_SKY_USERNAME not set");
+        let blue_sky_password = env::var("BLUE_SKY_PASSWORD").expect("BLUE_SKY_PASSWORD not set");
+
+        let agent = AtpAgent::new(
+            ReqwestClient::new("https://bsky.social"),
+            MemorySessionStore::default(),
+        );
+
+        agent.login(&blue_sky_username, &blue_sky_password).await?;
+        let now = Utc::now();
+
+        Ok(BlueSky {
+            agent,
+            last_updated: now,
+            posts: HashMap::new(),
+        })
     }
 
     fn name(&self) -> &'static str {
