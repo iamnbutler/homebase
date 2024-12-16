@@ -1,12 +1,14 @@
 use anyhow::Result;
 use std::{fs, path::PathBuf};
+use toml::Table;
 
-use crate::markdown::{Markdown, ParsedMarkdown};
+use crate::markdown::{FrontMatter, Markdown, ParsedMarkdown};
 use crate::services::content::Content;
 
 pub struct PostsCollection {
     src: PathBuf,
     parsed_posts: Vec<ParsedMarkdown>,
+    metadata: Table,
 }
 
 impl Content for PostsCollection {
@@ -18,9 +20,15 @@ impl Content for PostsCollection {
 impl PostsCollection {
     pub fn new(src: PathBuf) -> Result<PostsCollection> {
         let mut collection = PostsCollection {
-            src,
+            src: src.clone(),
             parsed_posts: Vec::new(),
+            metadata: Table::new(),
         };
+
+        // Load metadata from index.toml
+        let metadata_path = src.join("index.toml");
+        let metadata_content = fs::read_to_string(metadata_path)?;
+        collection.metadata = metadata_content.parse::<Table>()?;
 
         collection.parse_posts()?;
         Ok(collection)
@@ -28,25 +36,29 @@ impl PostsCollection {
 
     pub fn parse_posts(&mut self) -> Result<()> {
         self.parsed_posts.clear();
-        for entry in fs::read_dir(&self.src)? {
-            let entry = entry?;
-            let path = entry.path();
-            if path.is_file() && path.extension().map_or(false, |ext| ext == "md") {
-                let content = fs::read_to_string(&path)?;
-                let parsed_post = self.parse_post(&content)?;
-                self.parsed_posts.push(parsed_post);
+        for (year, posts) in self.metadata.iter() {
+            let year_dir = self.src.join(year);
+            if year_dir.is_dir() {
+                for (post_name, post_meta) in posts.as_table().unwrap().iter() {
+                    let file_path = year_dir.join(format!("{}.md", post_name));
+                    if file_path.is_file() {
+                        let content = fs::read_to_string(&file_path)?;
+                        let parsed_post = self.parse_post(post_meta, &content)?;
+                        self.parsed_posts.push(parsed_post);
+                    }
+                }
             }
         }
         Ok(())
     }
 
-    fn parse_post(&self, content: &str) -> Result<ParsedMarkdown> {
-        let (front_matter, markdown_content) = Markdown::parse_frontmatter(content)?;
-        let html_content = Markdown::parse(&markdown_content)?;
+    fn parse_post(&self, post_meta: &toml::Value, content: &str) -> Result<ParsedMarkdown> {
+        let front_matter: FrontMatter = post_meta.clone().try_into()?;
+        let html_content = Markdown::parse(content)?;
 
         Ok(ParsedMarkdown {
             front_matter,
-            content: markdown_content,
+            content: content.to_string(),
             html_content,
         })
     }

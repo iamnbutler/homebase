@@ -1,11 +1,3 @@
----
-title: Launching Facebook Avatars
-date: 2019-05-03
-tags:
-- design
-- work
----
-
 Today Facbook launched [a test of Facebook Avatars](https://www.theverge.com/2019/6/3/18650685/facebook-avatar-messenger-newsfeed-bitmoji) publicly! I worked on Avatars for around 2.5 years, so it is exciting to see it finally getting into the wild.
 
 I never would have imagined the complexity and amount of difficult decisions it takes to get a system like this off the ground. I have a lot of respect for all the teams out there working on likeness systems for people.

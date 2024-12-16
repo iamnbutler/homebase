@@ -1,29 +1,3 @@
----
-title: Design Workshop Posters
-date: 2015-11-25
-tags:
-- design
-- work
----
-
-After I wrapped up a period of deep design workshop exploration I wrote up some of what I discovered and created these posters.
-
-![](https://res.cloudinary.com/yaminateo/image/upload/v1637122428/project/workshop-posters/Poster-Book_fo8fk8.jpg)
-
-![](https://res.cloudinary.com/yaminateo/image/upload/v1637122429/project/workshop-posters/Poster-Book2_ik1fmj.jpg)
-
-![](https://res.cloudinary.com/yaminateo/image/upload/v1637122429/project/workshop-posters/Poster-Book3_xmqplx.jpg)
-
-![](https://res.cloudinary.com/yaminateo/image/upload/v1637122429/project/workshop-posters/Poster-Book4_qxpsj3.jpg)
-
-![](https://res.cloudinary.com/yaminateo/image/upload/v1637122429/project/workshop-posters/Poster-Book5_diu07s.jpg)
-
-An expanded version of the copy on the posts:
-
-## 1. Design = Making
-
----
-
 ### WHAT IS CUUUBIC?
 
 It is a project about exploring new techniques and ways of making. Rather than starting with a problem and trying to solve it, I chose a concept and started making things and exploring to find what I could discover. It was a very freeing process.

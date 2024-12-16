@@ -29,24 +29,27 @@ impl SiteGenerator {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Blue Sky Posts</title>
+    <title>My Blog Posts</title>
 </head>
 <body>
     <h1>Hello, World</h1>
 
     <h2>Posts</h2>
-    <ul>
     "#,
         );
 
-        html.push_str("    <ul>\n");
         for post in posts {
             html.push_str(&format!(
-                "        <li><a href=\"{}\">{}</a></li>\n",
-                post.front_matter.date, post.front_matter.title
+                r#"
+    <article>
+        <h3>{}</h3>
+        <time>{}</time>
+        {}
+    </article>
+    "#,
+                post.front_matter.title, post.front_matter.date, post.html_content
             ));
         }
-        html.push_str("    </ul>\n");
 
         html.push_str(
             r#"

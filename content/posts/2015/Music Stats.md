@@ -1,16 +1,8 @@
----
-title: Music Stats
-date: 2015-08-21
-tags:
-- design
-- dev
----
-
 ## The Project
 
 Music Stats is a visual art & infographic site. It's generated from my personal music listening history, showing 3 axis of data – total plays, recency of track, and "hotness" – custom score based on how frequently a song is played in relation to when it was added.
 
-![](https://res.cloudinary.com/yaminateo/image/upload/v1636936180/post/music-stats/Screenshot_2015-10-17_05.02.34_vfty5o.png)
+content/posts/Music Stats.md
 
 Individual bars represent songs. Taller bars are more frequently played, while warmer colored ones are hotter (played very frequently.)
 

@@ -1,10 +1,3 @@
----
-title: Creating Motion Graphics in Isadora
-date: 2013-11-05
-tags:
-- design
-- art
----
 ![](https://res.cloudinary.com/yaminateo/video/upload/v1637120269/project/isadora/academy-leader_eryomr.mp4)
 
 These are a few outputs from a project using Isadora to create motion visuals.

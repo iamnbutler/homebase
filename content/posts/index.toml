@@ -1,0 +1,42 @@
+[2024."Adding a Favicon in 2024"]
+title = "Adding a Favicon in 2024"
+date = "2024-02-27"
+tags = ["webdev"]
+series = "Astro Site 2024"
+
+[2024."Building a new site with Astro"]
+title = "Building a new site with Astro"
+date = "2024-02-26"
+tags = ["webdev", "js"]
+series = "Astro Site 2024"
+
+[2024."Generating a Content Index"]
+title = "Generating a Content Index"
+date = "2024-02-26"
+tags = ["webdev", "python"]
+series = "Astro Site 2024"
+
+[2019."Launching Facebook Avatars"]
+title = "Launching Facebook Avatars"
+date = "2019-05-03"
+tags = ["design", "work"]
+
+[2015."Music Stats"]
+title = "Music Stats"
+date = "2015-08-21"
+tags = ["design", "dev"]
+
+[2015."Design Workshop Posters"]
+title = "Design Workshop Posters"
+date = "2015-11-25"
+tags = ["design", "work"]
+
+[2013."Creating Visualizations in Isadora"]
+title = "Creating Motion Graphics in Isadora"
+date = "2013-11-05"
+tags = ["design", "art"]
+
+[2012."York Sheridan Design Website"]
+title = "York/Sheridan Design Website"
+date = "2012-06-17"
+tags = ["dev", "work"]
