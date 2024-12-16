@@ -1,5 +1,8 @@
+#![allow(dead_code)]
+
 mod content;
 mod context;
+mod includes;
 mod markdown;
 mod services;
 mod utils;

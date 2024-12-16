@@ -1,11 +1,9 @@
-use super::{blue_sky::FeedPost, Service};
-use crate::{
-    markdown::{slugify, ParsedMarkdown},
-    AppContext,
-};
+use std::fs;
+
+use super::Service;
+use crate::AppContext;
 use anyhow::Result;
 use async_trait::async_trait;
-use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub enum Layout {
@@ -58,7 +56,36 @@ impl SiteGenerator {
         });
     }
 
+    pub async fn copy_includes(&self, cx: &AppContext) -> Result<()> {
+        let includes_dir = cx.includes_dir();
+        let output_dir = cx.output_dir();
+
+        if includes_dir.is_dir() {
+            for entry in fs::read_dir(includes_dir)? {
+                let entry = entry?;
+                let path = entry.path();
+                if path.is_file() {
+                    let file_name = path.file_name().unwrap();
+                    let destination = output_dir.join(file_name);
+                    fs::copy(&path, &destination)?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    fn includes_str(&self) -> String {
+        let mut includes = String::new();
+        for style in crate::includes::includes().styles {
+            includes.push_str(&format!(r#"<link rel="stylesheet" href="{}">"#, style));
+        }
+        includes
+    }
+
     pub async fn generate(&self, cx: &AppContext) -> Result<()> {
+        self.copy_includes(cx).await?;
+
         for page in &self.pages {
             let html = self.render(page);
             let path = cx
@@ -86,6 +113,7 @@ impl SiteGenerator {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{}</title>
+    {}
 </head>
 <body>
     <h1>{}</h1>
@@ -93,7 +121,10 @@ impl SiteGenerator {
 </body>
 </html>
 "#,
-            page.properties.title, page.properties.title, page.content
+            page.properties.title,
+            self.includes_str(),
+            page.properties.title,
+            page.content
         )
     }
 
@@ -106,6 +137,7 @@ impl SiteGenerator {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{}</title>
+    {}
 </head>
 <body>
     <a href="index.html">&larr; Back Home</a>
@@ -116,7 +148,10 @@ impl SiteGenerator {
 </body>
 </html>
 "#,
-            page.properties.title, page.properties.title, page.content
+            page.properties.title,
+            self.includes_str(),
+            page.properties.title,
+            page.content
         )
     }
 }

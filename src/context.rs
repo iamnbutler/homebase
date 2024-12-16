@@ -13,7 +13,7 @@ pub async fn init() -> Result<Arc<AppContext>> {
     let cx = Arc::new(AppContext {
         content_dir: std::env::current_dir()?.join("content"),
         output_dir: std::env::current_dir()?.join("public"),
-
+        includes_dir: std::env::current_dir()?.join("src").join("includes"),
         blue_sky,
         content_sources,
         site_generator,
@@ -26,6 +26,7 @@ pub async fn init() -> Result<Arc<AppContext>> {
 pub struct AppContext {
     content_dir: PathBuf,
     output_dir: PathBuf,
+    includes_dir: PathBuf,
     blue_sky: Arc<RwLock<BlueSky>>,
     content_sources: Arc<RwLock<ContentSources>>,
     site_generator: Arc<RwLock<SiteGenerator>>,
@@ -39,6 +40,11 @@ impl AppContext {
     /// Returns the current working directory.
     pub fn cwd(&self) -> PathBuf {
         std::env::current_dir().expect("Failed to get current working directory")
+    }
+
+    /// Returns the includes directory.
+    pub fn includes_dir(&self) -> PathBuf {
+        self.includes_dir.clone()
     }
 
     /// Returns the content directory.
