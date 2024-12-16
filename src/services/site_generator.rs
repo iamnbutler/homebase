@@ -41,7 +41,7 @@ impl SiteGenerator {
             if !post.attachments.is_empty() {
                 for attachment in post.attachments {
                     html.push_str(&format!(
-                                "            <img src=\"{}\" alt=\"Post attachment\" class=\"post-image\">\n",
+                                "            <img src=\"{}\" alt=\"Post attachment\" class=\"post-image\" style=\"max-width: 90%;\">\n",
                                 attachment
                             ));
                 }
