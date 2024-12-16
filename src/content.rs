@@ -1,1 +1,1 @@
-mod posts;
+pub mod posts;

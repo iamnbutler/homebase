@@ -1,4 +1,5 @@
 use super::{Service, UpdateableService};
+use crate::content::posts::PostsCollection;
 use crate::context::AppContext;
 use anyhow::Result;
 use async_trait::async_trait;
@@ -8,26 +9,17 @@ pub trait Content {
     fn src(&self) -> &PathBuf;
 }
 
-pub struct Post {
-    src: PathBuf,
-}
-
-impl Content for Post {
-    fn src(&self) -> &PathBuf {
-        &self.src
-    }
-}
-
 pub struct ContentSources {
-    posts: Post,
+    posts: PostsCollection,
 }
 
 #[async_trait]
 impl Service for ContentSources {
     async fn init() -> Result<Self> {
-        let posts_src = std::env::current_dir()?.join("content").join("posts");
+        let posts_collection =
+            PostsCollection::new(std::env::current_dir()?.join("content").join("posts"))?;
         Ok(Self {
-            posts: Post { src: posts_src },
+            posts: posts_collection,
         })
     }
 
@@ -45,7 +37,7 @@ impl UpdateableService for ContentSources {
 }
 
 impl ContentSources {
-    pub fn posts(&self) -> &Post {
+    pub fn posts_collection(&self) -> &PostsCollection {
         &self.posts
     }
 }

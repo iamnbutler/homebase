@@ -1,3 +1,11 @@
+---
+title: Adding a Favicon in 2024
+date: 2024-02-27
+tags:
+  - webdev
+series: Astro Site 2024
+---
+
 Let's go on a quick side quest to add a favicon to this new site. These always seem to be a bit of a pain because the vendor requirements are always changing. Evil Martians have a really great writeup that covers a lot of this here: [How to Favicon in 2024: Six files that fit most needs
 ](https://evilmartians.com/chronicles/how-to-favicon-in-2021-six-files-that-fit-most-needs).
 

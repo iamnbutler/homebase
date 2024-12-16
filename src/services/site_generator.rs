@@ -18,7 +18,9 @@ impl Service for SiteGenerator {
 
 impl SiteGenerator {
     pub async fn generate(&self, cx: &AppContext) -> Result<()> {
-        let posts = cx.blue_sky().read().unwrap().get_ordered_posts();
+        let content_sources = cx.content_sources().read().unwrap();
+        let posts = content_sources.posts_collection().posts();
+        let bsky_posts = cx.blue_sky().read().unwrap().get_ordered_posts();
 
         let mut html = String::from(
             r#"
@@ -30,12 +32,30 @@ impl SiteGenerator {
     <title>My Blue Sky Posts</title>
 </head>
 <body>
-    <h1>My Blue Sky Posts</h1>
+    <h1>Hello, World</h1>
+
+    <h2>Posts</h2>
+    <ul>
+    "#,
+        );
+
+        html.push_str("    <ul>\n");
+        for post in posts {
+            html.push_str(&format!(
+                "        <li><a href=\"{}\">{}</a></li>\n",
+                post.front_matter.date, post.front_matter.title
+            ));
+        }
+        html.push_str("    </ul>\n");
+
+        html.push_str(
+            r#"
+    <h2>Blue Sky Posts</h2>
     <ul>
 "#,
         );
 
-        for post in posts {
+        for post in bsky_posts {
             html.push_str(&format!("        <li>\n            <p>{}</p>\n", post.text));
 
             if !post.attachments.is_empty() {

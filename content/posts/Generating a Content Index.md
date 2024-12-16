@@ -1,3 +1,12 @@
+---
+title: Generating a Content Index
+date: 2024-02-26
+tags:
+  - webdev
+  - python
+series: Astro Site 2024
+---
+
 I've been eyeing [TinySearch](https://github.com/tinysearch/tinysearch) for a long while, and now is a great chance while things are super simple to try to get it working.
 
 [Matthias Endler](https://endler.dev/2019/tinysearch/) has a great post on experimenting with building a _really_ tiny site-wide search utalizing Rust & WASM, and ever since I read it I've been wanting to try it out.

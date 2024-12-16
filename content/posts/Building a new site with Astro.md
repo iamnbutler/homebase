@@ -1,3 +1,12 @@
+---
+title: Building a new site with Astro
+date: 2024-02-26
+tags:
+  - webdev
+  - js
+series: Astro Site 2024
+---
+
 I'm out on paternity leave until early April, and with things finally calming down a little bit with the little one I thought I'd take a little time to build a new site.
 
 For now this is a bit of a back-to-basics approach. I'm trying out Astro, and it feels oddly nostalgic for some reason – like I'm building a site in the early 2000s. It's a bit of a throwback, but in a good way.
