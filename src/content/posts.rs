@@ -73,8 +73,9 @@ impl PostsCollection {
             html_content: html_output,
         })
     }
-
-    pub fn posts(&self) -> &[ParsedPost] {
-        &self.parsed_posts
+    pub fn posts(&self) -> Vec<&ParsedPost> {
+        let mut sorted_posts = self.parsed_posts.iter().collect::<Vec<_>>();
+        sorted_posts.sort_by(|a, b| b.front_matter.date.cmp(&a.front_matter.date));
+        sorted_posts
     }
 }
