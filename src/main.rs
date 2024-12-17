@@ -27,7 +27,7 @@ async fn main() -> Result<()> {
     // Generate index page
     let content_sources = cx.content_sources().read().unwrap();
     let posts = content_sources.posts_collection().posts();
-    let bsky_posts = cx.blue_sky().read().unwrap().get_ordered_posts();
+    let bsky = cx.blue_sky().read().unwrap();
 
     let mut index_content = String::new();
 
@@ -42,9 +42,7 @@ async fn main() -> Result<()> {
     }
 
     index_content.push_str("<h2>Blue Sky Posts</h2>");
-    for post in &bsky_posts {
-        index_content.push_str(&format!("<li>{}</li>", post.text));
-    }
+    index_content.push_str(&bsky.render_posts());
 
     site_generator.add_index("Home".to_string(), "index".to_string(), index_content);
 

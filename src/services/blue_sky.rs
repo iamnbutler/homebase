@@ -121,9 +121,27 @@ impl BlueSky {
             .iter()
             .filter_map(|item| {
                 let post = item.get("post")?;
+                let record = post.get("record")?;
+
+                // For now, just filter out reposts, replies, and quote posts
+                if item.get("reason").is_some() {
+                    return None;
+                }
+
+                if record.get("reply").is_some() {
+                    return None;
+                }
+
+                if let Some(embed) = post.get("embed") {
+                    if embed.get("$type").map_or(false, |t| {
+                        t.as_str().unwrap_or("") == "app.bsky.embed.record"
+                    }) {
+                        return None;
+                    }
+                }
+
                 let author = post.get("author")?;
                 let handle = author.get("handle")?.as_str()?.to_string();
-                let record = post.get("record")?;
                 let text = record.get("text")?.as_str()?.to_string();
                 let created_at = record.get("createdAt")?.as_str()?;
                 let created_at = DateTime::parse_from_rfc3339(created_at)
@@ -157,5 +175,29 @@ impl BlueSky {
             .collect();
 
         Ok(posts)
+    }
+
+    pub fn render_posts(&self) -> String {
+        let posts = self.get_ordered_posts();
+        posts
+            .iter()
+            .map(|post| {
+                let mut rendered = format!("<article>");
+                rendered.push_str(&format!("<div><p>{}</p>", post.text));
+                if !post.attachments.is_empty() {
+                    rendered.push_str("<div class=\"attachments\">");
+                    for attachment in &post.attachments {
+                        rendered
+                            .push_str(&format!("<img src=\"{}\" alt=\"Attachment\">", attachment));
+                    }
+                    rendered.push_str("</div>");
+                }
+                rendered.push_str("</div>");
+                rendered.push_str(&format!("<p>@{}</p>", post.handle));
+                rendered.push_str("</article>");
+                rendered
+            })
+            .collect::<Vec<String>>()
+            .join("\n\n")
     }
 }

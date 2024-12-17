@@ -70,6 +70,7 @@ html {
     font-style: normal;
     max-width: 100vw;
     overflow-x: hidden;
+    font-size: 20px;
 }
 
 body {
@@ -92,6 +93,14 @@ body {
 
 .index-grid > * {
     background-color: var(--white);
+}
+
+.index-grid > article {
+    padding: 1em;
+    height: 36em;
+    flex: 1 0;
+    flex-direction: column;
+    justify-self: space-between;
 }
 
 @media (max-width: 1200px) {
