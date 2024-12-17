@@ -4,6 +4,7 @@ use super::Service;
 use crate::AppContext;
 use anyhow::Result;
 use async_trait::async_trait;
+use unindent::Unindent;
 
 #[derive(Debug, Clone)]
 pub enum Layout {
@@ -104,54 +105,56 @@ impl SiteGenerator {
         }
     }
 
-    fn render_index(&self, page: &Page) -> String {
+    fn base_template(&self, page: &Page, content: &str) -> String {
         format!(
             r#"
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{}</title>
-    {}
-</head>
-<body>
-    <h1>{}</h1>
-    {}
-</body>
-</html>
-"#,
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>{}</title>
+                    {}
+                </head>
+                <body>
+                    <div class="container">
+                        {}
+                    </div>
+                </body>
+                </html>
+            "#,
             page.properties.title,
             self.includes_str(),
-            page.properties.title,
+            content
+        )
+        .unindent()
+    }
+
+    fn render_index(&self, page: &Page) -> String {
+        let content = format!(
+            r#"
+                <div class="index-grid">
+                    {}
+                </div>
+            "#,
             page.content
         )
+        .unindent();
+        self.base_template(page, &content)
     }
 
     fn render_page(&self, page: &Page) -> String {
-        format!(
+        let content = format!(
             r#"
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{}</title>
-    {}
-</head>
-<body>
-    <a href="index.html">&larr; Back Home</a>
-    <article>
-        <h1>{}</h1>
-        {}
-    </article>
-</body>
-</html>
-"#,
-            page.properties.title,
-            self.includes_str(),
-            page.properties.title,
-            page.content
+                <a href="index.html">&larr; Back Home</a>
+                <article>
+                    <h1>{}</h1>
+                    {}
+                </article>
+            "#,
+            page.properties.title, page.content
         )
+        .unindent();
+        self.base_template(page, &content)
     }
 }

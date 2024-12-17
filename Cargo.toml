@@ -25,4 +25,5 @@ serde_json = { version = "1.0.133", features = ["preserve_order", "raw_value"] }
 strum = { version = "0.25.0", features = ["derive"] }
 tokio = { version = "1.42.0", features = ["full"] }
 toml = "0.8.19"
+unindent = "0.2.3"
 uuid = { version = "1.1.2", features = ["v4", "serde"] }
