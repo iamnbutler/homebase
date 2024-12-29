@@ -27,7 +27,7 @@ async fn main() -> Result<()> {
     // Generate index page
     let content_sources = cx.content_sources().read().unwrap();
     let posts = content_sources.posts_collection().posts();
-    let bsky = cx.blue_sky().read().unwrap();
+    // let bsky = cx.blue_sky().read().unwrap();
 
     let mut index_content = String::new();
 
