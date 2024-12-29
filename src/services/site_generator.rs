@@ -133,11 +133,12 @@ impl SiteGenerator {
     fn render_index(&self, page: &Page) -> String {
         let content = format!(
             r#"
-                <div class="index-grid">
-                    {}
-                </div>
-            "#,
-            page.content
+                       <h1 class="headline-blue">{}</h1>
+                       <ul>
+                           {}
+                       </ul>
+                   "#,
+            page.properties.title, page.content
         )
         .unindent();
         self.base_template(page, &content)

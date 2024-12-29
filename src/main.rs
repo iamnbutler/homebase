@@ -31,6 +31,11 @@ async fn main() -> Result<()> {
 
     let mut index_content = String::new();
 
+    index_content.push_str("<div class='thin-column'>
+        <p>I'm nate butler, a designer & maker enabling people's creativity and ability share knowledge.</p>
+        <p>I want to help people create the things important to them—To empower them to create something themselves and feel the euphoria it brings. My goal is always to help the people around me level up, in their careers & lives.</p>
+        <p>I post about all types of things here. You will find a mix of work, top of mind, reflections, & process. Enjoy!</p>
+    </div>");
     index_content.push_str("<h2>Posts</h2>");
     for post in &posts {
         let slugified_title = slugify(&post.front_matter.title);
@@ -41,10 +46,14 @@ async fn main() -> Result<()> {
         ));
     }
 
-    index_content.push_str("<h2>Blue Sky Posts</h2>");
-    index_content.push_str(&bsky.render_posts());
+    // index_content.push_str("<li><h2>Blue Sky Posts</h2></li>");
+    // index_content.push_str(&bsky.render_posts());
 
-    site_generator.add_index("Home".to_string(), "index".to_string(), index_content);
+    index_content.push_str("<div class='thin-column'>
+        <p>This site is built with rust, html and css. It's source is <a href='https://github.com/iamnbutler/homebase'>fully open</a> and is hosted completely free. It's a work in progress, and will likely look and feel pretty rough as I figure out the apis and ways for us to compose, style, ship & deploy without spending anything!</p>
+    </div>");
+
+    site_generator.add_index("hey ✌🏽".to_string(), "index".to_string(), index_content);
 
     for post in posts {
         let slugified_title = slugify(&post.front_matter.title);
