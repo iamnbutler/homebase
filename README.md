@@ -6,6 +6,7 @@ Wandering through figuring out what is the right balance between "writing an ent
 
 Current ideas that may make it in:
 - [x] Generate pages from markdown
+- [ ] Use [liquid](https://docs.rs/liquid/latest/liquid/) or [handlebars](https://docs.rs/handlebars/latest/handlebars/) for templating?
 - [ ] a full fat site raw html static site generator
 - [ ] a set of services for getting and processing data
 - [ ] a content index used for full content site search
