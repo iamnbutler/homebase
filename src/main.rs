@@ -10,24 +10,48 @@ mod utils;
 use anyhow::Result;
 use context::AppContext;
 use dotenv::dotenv;
+use log::{debug, error, info};
 use markdown::slugify;
 use services::UpdateableService;
 
 // todo!(): Stop blindly unwrapping
 #[tokio::main]
 async fn main() -> Result<()> {
+    env_logger::init();
+
+    info!("Starting application");
+
     dotenv().ok();
+    info!("Loaded .env file");
 
-    let cx = AppContext::new().await?;
+    info!("Initializing AppContext");
+    let cx = match AppContext::new().await {
+        Ok(context) => context,
+        Err(e) => {
+            error!("Failed to initialize AppContext: {:?}", e);
+            return Err(e);
+        }
+    };
 
-    cx.blue_sky().write().unwrap().update(&cx).await?;
+    debug!("Current working directory: {:?}", std::env::current_dir()?);
+    debug!("Content directory: {:?}", cx.content_dir());
+    debug!("Output directory: {:?}", cx.output_dir());
+    debug!("Includes directory: {:?}", cx.includes_dir());
 
+    info!("Updating BlueSky");
+    if let Err(e) = cx.blue_sky().write().unwrap().update(&cx).await {
+        error!("Failed to update BlueSky: {:?}", e);
+        return Err(e);
+    }
+
+    info!("Generating site content");
     let mut site_generator = cx.site_generator().write().unwrap();
 
     // Generate index page
     let content_sources = cx.content_sources().read().unwrap();
     let posts = content_sources.posts_collection().posts();
-    // let bsky = cx.blue_sky().read().unwrap();
+
+    info!("Found {} posts", posts.len());
 
     let mut index_content = String::new();
 
@@ -65,7 +89,12 @@ async fn main() -> Result<()> {
         );
     }
 
-    site_generator.generate(&cx).await?;
+    info!("Generating site");
+    if let Err(e) = site_generator.generate(&cx).await {
+        error!("Failed to generate site: {:?}", e);
+        return Err(e);
+    }
 
+    info!("Site generation complete");
     Ok(())
 }

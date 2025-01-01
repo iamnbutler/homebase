@@ -9,6 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      RUST_LOG: debug
       BLUE_SKY_USERNAME: ${{ secrets.BLUE_SKY_USERNAME }}
       BLUE_SKY_PASSWORD: ${{ secrets.BLUE_SKY_PASSWORD }}
     steps:
