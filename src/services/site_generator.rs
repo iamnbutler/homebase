@@ -62,23 +62,47 @@ impl SiteGenerator {
     }
 
     pub async fn copy_includes(&self, cx: &AppContext) -> Result<()> {
-        info!("Copying includes");
         let includes_dir = cx.includes_dir();
         let output_dir = cx.output_dir();
 
-        if includes_dir.is_dir() {
-            for entry in fs::read_dir(includes_dir)? {
-                let entry = entry?;
-                let path = entry.path();
-                if path.is_file() {
-                    let file_name = path.file_name().unwrap();
-                    let destination = output_dir.join(file_name);
-                    debug!("Copying file: {:?} to {:?}", path, destination);
-                    fs::copy(&path, &destination)?;
+        info!(
+            "Copying includes from {:?} to {:?}",
+            includes_dir, output_dir
+        );
+
+        if !includes_dir.exists() {
+            error!("Includes directory does not exist: {:?}", includes_dir);
+            return Err(anyhow::anyhow!("Includes directory does not exist"));
+        }
+
+        if !includes_dir.is_dir() {
+            error!("Includes path is not a directory: {:?}", includes_dir);
+            return Err(anyhow::anyhow!("Includes path is not a directory"));
+        }
+
+        if !output_dir.exists() {
+            info!(
+                "Output directory does not exist, creating: {:?}",
+                output_dir
+            );
+            fs::create_dir_all(&output_dir)?;
+        }
+
+        for entry in fs::read_dir(includes_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_file() {
+                let file_name = path.file_name().unwrap();
+                let destination = output_dir.join(file_name);
+                info!("Copying file: {:?} to {:?}", path, destination);
+                match fs::copy(&path, &destination) {
+                    Ok(_) => info!("Successfully copied {:?}", file_name),
+                    Err(e) => {
+                        error!("Failed to copy {:?}: {:?}", file_name, e);
+                        return Err(e.into());
+                    }
                 }
             }
-        } else {
-            error!("Includes directory not found: {:?}", includes_dir);
         }
 
         Ok(())
