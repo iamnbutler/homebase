@@ -14,6 +14,56 @@ pub enum Layout {
 }
 
 #[derive(Debug, Clone)]
+pub struct PageBuilder {
+    layout: Layout,
+    title: String,
+    slug: String,
+    content: Vec<String>,
+}
+
+impl PageBuilder {
+    pub fn new(layout: Layout) -> Self {
+        Self {
+            layout,
+            title: String::new(),
+            slug: String::new(),
+            content: Vec::new(),
+        }
+    }
+
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.title = title.into();
+        self
+    }
+
+    pub fn slug(mut self, slug: impl Into<String>) -> Self {
+        self.slug = slug.into();
+        self
+    }
+
+    pub fn child(mut self, content: impl Into<String>) -> Self {
+        self.content.push(content.into());
+        self
+    }
+
+    pub fn children(mut self, content: impl IntoIterator<Item = impl Into<String>>) -> Self {
+        self.content.extend(content.into_iter().map(Into::into));
+        self
+    }
+
+    pub fn build(self) -> Page {
+        Page {
+            layout: self.layout,
+            properties: LayoutProperties {
+                title: self.title,
+                slug: self.slug,
+            },
+            content: self.content.join("\n"),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct LayoutProperties {
     pub title: String,
     pub slug: String,
@@ -42,22 +92,13 @@ impl Service for SiteGenerator {
 }
 
 impl SiteGenerator {
-    pub fn add_index(&mut self, title: String, slug: String, content: String) {
-        debug!("Adding index page: {}", title);
-        self.pages.push(Page {
-            layout: Layout::Index,
-            properties: LayoutProperties { title, slug },
-            content,
-        });
+    pub fn new_page(&mut self, layout: Layout) -> PageBuilder {
+        PageBuilder::new(layout)
     }
 
-    pub fn add_page(&mut self, title: String, slug: String, content: String) {
-        debug!("Adding page: {}", title);
-        self.pages.push(Page {
-            layout: Layout::Page,
-            properties: LayoutProperties { title, slug },
-            content,
-        });
+    pub fn add_page(&mut self, page: Page) {
+        debug!("Adding page: {}", page.properties.title);
+        self.pages.push(page);
     }
 
     pub async fn copy_includes(&self, cx: &AppContext) -> Result<()> {
@@ -191,10 +232,10 @@ impl SiteGenerator {
     fn render_index(&self, page: &Page) -> String {
         let content = format!(
             r#"
-                <h1 class="headline-blue">{}</h1>
-                <ul>
-                    {}
-                </ul>
+            <h1 class="headline-blue">{}</h1>
+            <ul>
+                {}
+            </ul>
             "#,
             page.properties.title, page.content
         )
