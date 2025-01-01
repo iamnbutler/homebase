@@ -1,0 +1,159 @@
+/* Reset from https://www.joshwcomeau.com/css/custom-css-reset/ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+}
+
+body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    overflow-wrap: break-word;
+}
+
+p {
+    text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-wrap: balance;
+}
+
+#root {
+    isolation: isolate;
+}
+
+/* End reset */
+
+:root {
+    --black: #000;
+    --white: #fff;
+}
+
+html {
+    font-family: "Lora", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    max-width: 100vw;
+    overflow-x: hidden;
+    font-size: 20px;
+}
+
+body {
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+
+    padding: 2em 0;
+}
+
+.thin-column {
+    width: 375px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.headline {
+    position: absolute;
+    font-family: "Lora";
+    font-style: normal;
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 60px;
+    letter-spacing: 0.1em;
+    color: #000000;
+}
+
+.headline-blue {
+    width: 214px;
+    height: 62px;
+    left: 78px;
+    top: 20px;
+    text-decoration-line: underline;
+    text-shadow: 8px 8px 0px rgba(0, 255, 255, 0.3);
+    transform: rotate(-1deg);
+}
+
+.headline-green {
+    width: 142px;
+    height: 60px;
+    left: 19px;
+    top: 23px;
+    text-shadow: 8px 8px 0px rgba(0, 255, 0, 0.3);
+    transform: rotate(-1.3deg);
+}
+
+.headline-yellow {
+    width: 177px;
+    height: 60px;
+    left: 22px;
+    top: 22px;
+    text-shadow: 8px 8px 0px rgba(255, 255, 0, 0.3);
+    transform: rotate(2.18deg);
+}
+
+.large-blue-headline {
+    font-size: 48px;
+    color: #000;
+    text-shadow: 8px 8px 0px rgba(0, 255, 255, 0.3);
+    margin-bottom: 20px;
+}
+
+.description {
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+article header {
+    margin-bottom: 40px;
+}
+
+article .content {
+    line-height: 1.6;
+}
