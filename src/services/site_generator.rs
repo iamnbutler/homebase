@@ -37,7 +37,6 @@ impl Service for SiteGenerator {
     }
 
     async fn init() -> Result<Self> {
-        info!("Initializing SiteGenerator");
         Ok(Self { pages: Vec::new() })
     }
 }
@@ -143,41 +142,60 @@ impl SiteGenerator {
         }
     }
 
+    fn head_template(&self, page: &Page) -> String {
+        format!(
+            r#"
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2295%22>✌️</text></svg>">
+                <title>{}</title>
+                {}
+            "#,
+            page.properties.title,
+            self.includes_str()
+        )
+        .unindent()
+    }
+
+    fn container_template(&self, content: &str) -> String {
+        format!(
+            r#"
+                <div class="container">
+                    {}
+                </div>
+            "#,
+            content
+        )
+        .unindent()
+    }
+
     fn base_template(&self, page: &Page, content: &str) -> String {
-        debug!("Applying base template for: {}", page.properties.title);
         format!(
             r#"
                 <!DOCTYPE html>
                 <html lang="en">
                 <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>{}</title>
                     {}
                 </head>
                 <body>
-                    <div class="container">
-                        {}
-                    </div>
+                    {}
                 </body>
                 </html>
             "#,
-            page.properties.title,
-            self.includes_str(),
+            self.head_template(page),
             content
         )
         .unindent()
     }
 
     fn render_index(&self, page: &Page) -> String {
-        debug!("Rendering index page: {}", page.properties.title);
         let content = format!(
             r#"
-                       <h1 class="headline-blue">{}</h1>
-                       <ul>
-                           {}
-                       </ul>
-                   "#,
+                <h1 class="headline-blue">{}</h1>
+                <ul>
+                    {}
+                </ul>
+            "#,
             page.properties.title, page.content
         )
         .unindent();
@@ -185,7 +203,6 @@ impl SiteGenerator {
     }
 
     fn render_page(&self, page: &Page) -> String {
-        debug!("Rendering regular page: {}", page.properties.title);
         let content = format!(
             r#"
                 <a href="index.html">&larr; Back Home</a>

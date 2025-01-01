@@ -38,13 +38,11 @@ async fn main() -> Result<()> {
     debug!("Output directory: {:?}", cx.output_dir());
     debug!("Includes directory: {:?}", cx.includes_dir());
 
-    info!("Updating BlueSky");
     if let Err(e) = cx.blue_sky().write().unwrap().update(&cx).await {
         error!("Failed to update BlueSky: {:?}", e);
         return Err(e);
     }
 
-    info!("Generating site content");
     let mut site_generator = cx.site_generator().write().unwrap();
 
     // Generate index page
